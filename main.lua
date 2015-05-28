@@ -1,4 +1,3 @@
-dofile("websocket.lua")
 do
 local encode = websocket.encode
 local decode = websocket.decode

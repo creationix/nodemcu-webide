@@ -6,6 +6,8 @@ tmr.alarm(0, 1000, 1, function ()
   if ip then
     tmr.stop(0)
     print(ip)
+    dofile("websocket.lc")
+    dofile("main.lc")
   else
     print("Connecting to WIFI...")
   end
