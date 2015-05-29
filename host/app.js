@@ -73,13 +73,18 @@ function Remote(ip, onOut) {
 function App(emit, refresh, refs) {
   var lines = [];
   // TODO: let UI choose address
-  var remote = Remote("192.168.1.148", onOut);
+  var remote;
+  var ip;
   return {
     render: render,
     on: { send: onSend }
   };
 
-  function render() {
+  function render(newIp) {
+    if (newIp !== ip) {
+      ip = newIp;
+      remote = Remote(ip, onOut);
+    }
     return [".app$app", [Console, lines]];
   }
 
@@ -163,7 +168,7 @@ function Console(emit, refresh) {
     if (evt.key === "ArrowUp") {
       move = -1;
     }
-    else if (evt.key == "ArrowDown") {
+    else if (evt.key === "ArrowDown") {
       move = 1;
     }
     else {
@@ -181,53 +186,15 @@ function Console(emit, refresh) {
 
 window.onload = function () {
   "use strict";
-  domChanger(App, document.body).update();
+  var ip = window.location.hash.substring(1);
+  if (!ip) {
+    ip = window.prompt("Enter IP address of nodeMCU");
+    window.location.hash = ip;
+  }
+  window.domChanger(App, document.body).update(ip);
   document.querySelector(".console input").focus();
 
-  // var socket = new WebSocket("ws://192.168.1.148/");
-  // socket.binaryType = "arraybuffer";
-  // var onbinary;
-  //
-  // function decodeUtf8(utf8) {
-  //   return decodeURIComponent(window.escape(utf8));
-  // }
-  //
-  // function encodeUtf8(unicode) {
-  //   return window.unescape(encodeURIComponent(unicode));
-  // }
-  //
-  // function toRaw(binary, start, end) {
-  //   var raw = "";
-  //   if (end === undefined) {
-  //     end = binary.length;
-  //     if (start === undefined) start = 0;
-  //   }
-  //   for (var i = start; i < end; i++) {
-  //     raw += String.fromCharCode(binary[i]);
-  //   }
-  //   return raw;
-  // }
-  //
-  // function fromRaw(raw, binary, offset) {
-  //   var length = raw.length;
-  //   if (offset === undefined) {
-  //     offset = 0;
-  //     if (binary === undefined) binary = new Uint8Array(length);
-  //   }
-  //   for (var i = 0; i < length; i++) {
-  //     binary[offset + i] = raw.charCodeAt(i);
-  //   }
-  //   return binary;
-  // }
-  //
-  // function toUnicode(binary, start, end) {
-  //   return decodeUtf8(toRaw(binary, start, end));
-  // }
-  //
-  // function fromUnicode(unicode, binary, offset) {
-  //   return fromRaw(encodeUtf8(unicode), binary, offset);
-  // }
-  //
+
   // function loadFile(path, callback) {
   //   socket.send("load:" + path);
   //   onbinary = function (buffer) {
