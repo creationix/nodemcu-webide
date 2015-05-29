@@ -11,9 +11,9 @@ Go to mcu folder and edit ssid/password in init.lua.
 Then run:
 
 ```sh
-./luatool.py -f init.lua
-./luatool.py -f main.lua -c
 ./luatool.py -f websocket.lua -c
+./luatool.py -f main.lua -c
+./luatool.py -f init.lua
 ```
 
 Then restart the mcu and note the IP address printed on the serial console.
