@@ -4,7 +4,51 @@ html {
 *, *:before, *:after {
   box-sizing: inherit;
 }
-
+.app {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
+}
+.lines {
+  position: absolute;
+  top: 0;
+  bottom: 2em;
+  left: 0;
+  right: 0;
+  overflow: auto;
+}
+input.command {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  bottom: 0;
+  height: 2em;
+  line-height: 2em;
+  background-color: #111;
+  border: 0;
+}
+.console {
+  font-family: monospace;
+  color: #48c;
+}
+.console ul {
+  padding: 0;
+}
+.console li {
+  list-style-type: none;
+  white-space: pre-wrap;
+}
+.notice {
+  color: #888;
+  font-style: italic;
+}
+.command {
+  color: #fff;
+}
 html, body {
   height: 100%;
   position: absolute;
@@ -18,20 +62,4 @@ body {
   background-color: #000;
   color: #fff;
   overflow: none;
-}
-textarea {
-  padding: 1em;
-  line-height: 1.5em;
-  border: 0;
-  margin: 0;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 50%;
-  height: 100%;
-  width: 50%;
-  overflow: auto;
-  background-color: #222;
-  color: #eee;
 }
