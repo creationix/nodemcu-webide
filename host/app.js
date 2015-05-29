@@ -45,7 +45,6 @@ function Remote(ip, onOut) {
     open = false;
     opening = false;
     onOut(["span.notice", "Socket Closed"]);
-    setTimeout(ensure, 3000);
   }
 
   function onMessage(evt) {
