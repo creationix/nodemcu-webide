@@ -1,0 +1,37 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+html, body {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+body {
+  margin: 0;
+  background-color: #000;
+  color: #fff;
+  overflow: none;
+}
+textarea {
+  padding: 1em;
+  line-height: 1.5em;
+  border: 0;
+  margin: 0;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  width: 50%;
+  overflow: auto;
+  background-color: #222;
+  color: #eee;
+}

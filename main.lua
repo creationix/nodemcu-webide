@@ -31,10 +31,19 @@ websocket.createServer(80, function (socket)
         node.compile(name)
       elseif command == "run" then
         dofile(name)
-      elseif command == "eval" then 
-        local fn = loadstring(data, name)
+      elseif command == "eval" then
+        local fn, success, err
+        fn, err = loadstring(data, name)
+        if not fn then
+          fn = loadstring("print(" .. data .. ")", name)
+        end
         data = nil
-        fn()
+        if fn then
+          success, err = pcall(fn)
+        end
+        if not success then
+          print(err)
+        end
       else
         print("Invalid command: " .. command)
       end

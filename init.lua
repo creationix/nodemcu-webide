@@ -7,6 +7,7 @@ tmr.alarm(0, 1000, 1, function ()
     tmr.stop(0)
     print(ip)
     dofile("websocket.lc")
+    node.compile("main.lua")
     dofile("main.lc")
   else
     print("Connecting to WIFI...")
