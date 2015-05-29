@@ -3,6 +3,9 @@ A websocket based IDE for nodemcu devices.
 
 ## Install on MCU
 
+This has been tested on the dev branch of nodemcu.  It needs to have the new
+crypto module to function.
+
 Go to mcu folder and edit ssid/password in init.lua.
 
 Then run:
