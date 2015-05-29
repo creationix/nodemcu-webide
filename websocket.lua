@@ -13,7 +13,7 @@ local applyMask = crypto.mask
 local toBase64 = crypto.toBase64
 local sha1 = crypto.sha1
 
-function websocket.decode(chunk)
+local function decode(chunk)
   if #chunk < 2 then return end
   local second = byte(chunk, 2)
   local len = band(second, 0x7f)
@@ -53,7 +53,7 @@ function websocket.decode(chunk)
   return extra, payload, opcode
 end
 
-function websocket.encode(payload, opcode)
+local function encode(payload, opcode)
   opcode = opcode or 2
   assert(type(opcode) == "number", "opcode must be number")
   assert(type(payload) == "string", "payload must be string")
@@ -77,8 +77,51 @@ function websocket.encode(payload, opcode)
 end
 
 local guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-function websocket.acceptKey(key)
+local function acceptKey(key)
   return toBase64(sha1(key .. guid))
+end
+
+function websocket.createServer(port, callback)
+  net.createServer(net.TCP):listen(port, function(conn)
+    local buffer = false
+    local socket = {}
+    function socket.send(...)
+      return conn:send(encode(...))
+    end
+
+    conn:on("receive", function(_, chunk)
+      if buffer then
+        buffer = buffer .. chunk
+        while true do
+          local extra, payload, opcode = decode(buffer)
+          if not extra then return end
+          buffer = extra
+          socket.onmessage(payload, opcode)
+        end
+      end
+      local _, e, method = string.find(chunk, "([A-Z]+) /[^\r]* HTTP/%d%.%d\r\n")
+      local key, name, value
+      while true do
+        _, e, name, value = string.find(chunk, "([^ ]+): *([^\r]+)\r\n", e + 1)
+        if not e then break end
+        if string.lower(name) == "sec-websocket-key" then
+          key = value
+        end
+      end
+
+      if method == "GET" and key then
+        conn:send("HTTP/1.1 101 Switching Protocols\r\n")
+        conn:send("Upgrade: websocket\r\n")
+        conn:send("Connection: Upgrade\r\n")
+        conn:send("Sec-WebSocket-Accept: " .. acceptKey(key) .. "\r\n\r\n")
+        buffer = ""
+        callback(socket)
+      else
+        conn:send("HTTP/1.1 404 Not Found\r\nConnection: Close\r\n\r\n")
+        conn:on("sent", conn.close)
+      end
+    end)
+  end)
 end
 
 end
