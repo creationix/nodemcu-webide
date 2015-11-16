@@ -60,7 +60,7 @@ local function encode(payload, opcode)
   local len = #payload
   local head = char(
     bor(0x80, opcode),
-    bor(len < 0x80 and len or len < 0x10000 and 126 or 127)
+    bor(len < 126 and len or len < 0x10000 and 126 or 127)
   )
   if len >= 0x10000 then
     head = head .. char(
@@ -70,7 +70,7 @@ local function encode(payload, opcode)
     band(rshift(len, 8), 0xff),
     band(len, 0xff)
   )
-  elseif len >= 0x80 then
+  elseif len >= 126 then
     head = head .. char(band(rshift(len, 8), 0xff), band(len, 0xff))
   end
   return head .. payload
