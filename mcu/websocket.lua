@@ -11,7 +11,7 @@ local byte = string.byte
 local sub = string.sub
 local applyMask = crypto.mask
 local toBase64 = crypto.toBase64
-local sha1 = crypto.sha1
+local hash = crypto.hash
 
 local function decode(chunk)
   if #chunk < 2 then return end
@@ -78,7 +78,7 @@ end
 
 local guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 local function acceptKey(key)
-  return toBase64(sha1(key .. guid))
+  return toBase64(hash("sha1", key .. guid))
 end
 
 function websocket.createServer(port, callback)
