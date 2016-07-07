@@ -1,7 +1,6 @@
 do
 local websocket = {}
 _G.websocket = websocket
-
 local band = bit.band
 local bor = bit.bor
 local rshift = bit.rshift
@@ -85,8 +84,23 @@ function websocket.createServer(port, callback)
   net.createServer(net.TCP):listen(port, function(conn)
     local buffer = false
     local socket = {}
+    local queue = {}
+    local waiting = false
+    local function onSend()
+      if queue[1] then
+        local data = table.remove(queue, 1)
+        return conn:send(data, onSend)
+      end
+      waiting = false
+    end
     function socket.send(...)
-      return conn:send(encode(...))
+      local data = encode(...)
+      if not waiting then
+        waiting = true
+        conn:send(data, onSend)
+      else
+        queue[#queue + 1] = data
+      end
     end
 
     conn:on("receive", function(_, chunk)
@@ -110,15 +124,16 @@ function websocket.createServer(port, callback)
       end
 
       if method == "GET" and key then
-        conn:send("HTTP/1.1 101 Switching Protocols\r\n")
-        conn:send("Upgrade: websocket\r\n")
-        conn:send("Connection: Upgrade\r\n")
-        conn:send("Sec-WebSocket-Accept: " .. acceptKey(key) .. "\r\n\r\n")
+        conn:send(
+          "HTTP/1.1 101 Switching Protocols\r\n" ..
+          "Upgrade: websocket\r\nConnection: Upgrade\r\n" ..
+          "Sec-WebSocket-Accept: " .. acceptKey(key) .. "\r\n\r\n",
+          function () callback(socket) end)
         buffer = ""
-        callback(socket)
       else
-        conn:send("HTTP/1.1 404 Not Found\r\nConnection: Close\r\n\r\n")
-        conn:on("sent", conn.close)
+        conn:send(
+          "HTTP/1.1 404 Not Found\r\nConnection: Close\r\n\r\n",
+          conn.close)
       end
     end)
   end)
